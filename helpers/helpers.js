@@ -73,6 +73,31 @@ async function getEstimatedReturn(amount, _routerPath, _token0, _token1) {
     return { amountIn, amountOut }
 }
 
+async function getTokenAndContractSingle(_tokenAddress) {
+    const tokenContract = new web3.eth.Contract(IERC20.abi, _tokenAddress)
+
+    const token = new Token(
+        ChainId.MAINNET,
+        _tokenAddress,
+        18,
+        await tokenContract.methods.symbol().call(),
+        await tokenContract.methods.name().call()
+    )
+
+    return { tokenContract, token }
+}
+
+async function getBaseFee(URL = 'ws://127.0.0.1:7545') {
+
+    var _web3 = new Web3(URL)    
+
+    // NOTE: Property 'baseFeePerGas' does not exist on type 'BlockTransactionString'
+    const block = await _web3.eth.getBlock("pending");
+    const estimatedGasCost = block.baseFeePerGas;
+
+    return estimatedGasCost
+}
+
 module.exports = {
     getTokenAndContract,
     getPairAddress,
@@ -80,5 +105,7 @@ module.exports = {
     getReserves,
     calculatePrice,
     calculateDifference,
-    getEstimatedReturn
+    getEstimatedReturn,
+    getTokenAndContractSingle,
+    getBaseFee
 }
