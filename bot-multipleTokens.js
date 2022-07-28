@@ -7,16 +7,16 @@ require("dotenv").config();
 const { performance } = require('perf_hooks');
 
 //////////////////////
-// const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
 
-// const BOT_TOKEN='5374386214:AAG0ow4m8EvmkDhtbE1TQfMp08wpasWOWtI'
-// const CHATID=1018695738
+const BOT_TOKEN='5374386214:AAG0ow4m8EvmkDhtbE1TQfMp08wpasWOWtI'
+const CHATID=1018695738
 
-// // replace the value below with the Telegram token you receive from @BotFather
-// const token = BOT_TOKEN;
-// // read the doc from https://github.com/yagop/node-telegram-bot-api to know how to catch the chatId
-// const chatId = CHATID;
-// const bot = new TelegramBot(token, { polling: false })
+// replace the value below with the Telegram token you receive from @BotFather
+const token = BOT_TOKEN;
+// read the doc from https://github.com/yagop/node-telegram-bot-api to know how to catch the chatId
+const chatId = CHATID;
+const bot = new TelegramBot(token, { polling: false })
 ////////////////////
 
 
@@ -53,7 +53,7 @@ const estimatedGasCost = process.env.GAS_PRICE // Estimated Gas: 0.0084532200000
 let uPair, sPair, amount
 let isExecuting = false
 
-// let outputTelegram
+let outputTelegram
 let startTime
 
 
@@ -120,7 +120,7 @@ const main = async () => {
         console.log(token1.symbol)
     }
 
-    // bot.sendMessage(chatId, 'Script started...')
+    bot.sendMessage(chatId, 'Script started...')
 
     for (let i=0; i < _uPairConcracts.length; i++) {
 
@@ -163,8 +163,8 @@ const main = async () => {
                 if (!routerPath) {
                     console.log(`No Arbitrage Currently Available\n`)
                     console.log(`-----------------------------------------\n`)
-                    // outputTelegram = 'No Arbitrage Currently Available'
-                    // bot.sendMessage(chatId, outputTelegram)
+                    outputTelegram = 'No Arbitrage Currently Available'
+                    bot.sendMessage(chatId, outputTelegram)
                     
                     isExecuting = false
                     return
@@ -175,8 +175,8 @@ const main = async () => {
                 if (!isProfitable) {
                     console.log(`No Arbitrage Currently Available\n`)
                     console.log(`-----------------------------------------\n`)
-                    // outputTelegram = 'No Arbitrage Currently Available'
-                    // bot.sendMessage(chatId, outputTelegram)
+                    outputTelegram = 'No Arbitrage Currently Available'
+                    bot.sendMessage(chatId, outputTelegram)
 
                     isExecuting = false
                     return
@@ -400,9 +400,9 @@ const executeTrade = async (_routerPath, _token0Contract, _token1Contract) => {
 
 
 
-    // outputTelegram = 'Total Gained/Lost ' + `${web3.utils.fromWei((balanceDifference - totalSpent).toString(), 'ether')} ETH`
+    outputTelegram = 'Total Gained/Lost ' + `${web3.utils.fromWei((balanceDifference - totalSpent).toString(), 'ether')} ETH`
 
-    // bot.sendMessage(chatId, outputTelegram)
+    bot.sendMessage(chatId, outputTelegram)
 
 }
 

@@ -5,11 +5,21 @@ const Big = require('big.js');
 const Web3 = require('web3');
 let web3
 
-if (!config.PROJECT_SETTINGS.isLocal) {
+// if (!config.PROJECT_SETTINGS.isLocal) {
+//     web3 = new Web3(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
+// } else {
+//     web3 = new Web3('ws://127.0.0.1:7545')
+// }
+
+
+if (config.PROJECT_SETTINGS.networkConfig === "main") {
     web3 = new Web3(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
-} else {
+} else if (config.PROJECT_SETTINGS.networkConfig === "test") {
     web3 = new Web3('ws://127.0.0.1:7545')
+} else if  (config.PROJECT_SETTINGS.networkConfig === "kovan") {
+    web3 = new Web3('wss://kovan.infura.io/ws/v3/a8aa19688193447d9a185f415344cf61')
 }
+
 
 const { ChainId, Token } = require("@uniswap/sdk")
 const IUniswapV2Pair = require("@uniswap/v2-core/build/IUniswapV2Pair.json")
@@ -89,10 +99,10 @@ async function getTokenAndContractSingle(_tokenAddress) {
 
 async function getBaseFee(URL = 'ws://127.0.0.1:7545') {
 
-    var _web3 = new Web3(URL)    
+    // var _web3 = new Web3(URL)    
 
     // NOTE: Property 'baseFeePerGas' does not exist on type 'BlockTransactionString'
-    const block = await _web3.eth.getBlock("pending");
+    const block = await web3.eth.getBlock("pending");
     const estimatedGasCost = block.baseFeePerGas;
 
     return estimatedGasCost

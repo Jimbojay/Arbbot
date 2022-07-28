@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@node-telegram-bot-api": "0.58.0",
     "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/providers": "^5.5.1",
     "@ethersproject/solidity": "^5.5.0",
@@ -25,6 +26,7 @@
     "babel-register": "^6.26.0",
     "big.js": "^6.1.1",
     "dotenv": "^10.0.0",
+    "node-telegram-bot-api": "^0.58.0",
     "web3": "^1.6.1"
   }
 }
