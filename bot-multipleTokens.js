@@ -26,7 +26,7 @@ const { uFactory, uRouter, sFactory, sRouter, web3, arbitrage } = require('./hel
 
 // -- .ENV VALUES HERE -- //
 
-const arbFor = process.env.ARB_FOR // This is the address of token we are attempting to arbitrage (WETH)
+const arbForWETH = process.env.WETH_ADDRESS // This is the address of token we are attempting to arbitrage (WETH)
 const arbAgainstSHIB = process.env.SHIB_ADDRESS // SHIB
 const arbAgainstLINK = process.env.LINK_ADDRESS // LINK
 const arbAgainstMATIC = process.env.MATIC_ADDRESS // LINK
@@ -37,6 +37,10 @@ const arbAgainstSAND = process.env.SAND_ADDRESS // LINK
 const arbAgainstMANA = process.env.MANA_ADDRESS // LINK
 const arbAgainstAXS = process.env.AXS_ADDRESS // LINK
 const arbAgainstAAVE = process.env.AAVE_ADDRESS // LINK
+
+const arbForWETHKovan = process.env.WETH_ADDRESS_KOVAN // This is the address of token we are attempting to arbitrage (WETH)
+const arbAgainstSHIBKovan = process.env.SHIB_ADDRESS_KOVAN // SHIB
+const arbAgainstLINKKovan = process.env.LINK_ADDRESS_KOVAN // LINK
 
 const infuraApiKey = process.env.INFURA_API_KEY
 
@@ -55,23 +59,33 @@ let isExecuting = false
 
 let outputTelegram
 let startTime
-
-
+let arbFor
 
 const main = async () => {
 
     //Create array of arbAgainst
     const arbAgainstTokens = []
-    arbAgainstTokens.push(arbAgainstLINK)
-    arbAgainstTokens.push(arbAgainstMATIC)
-    arbAgainstTokens.push(arbAgainstLEO)
-    arbAgainstTokens.push(arbAgainstCRO)
-    arbAgainstTokens.push(arbAgainstAPE)
-    arbAgainstTokens.push(arbAgainstSAND)
-    arbAgainstTokens.push(arbAgainstMANA)
-    arbAgainstTokens.push(arbAgainstAXS)
-    arbAgainstTokens.push(arbAgainstAAVE)
-    arbAgainstTokens.push(arbAgainstSHIB)
+
+    if (config.PROJECT_SETTINGS.networkConfig === "main" || config.PROJECT_SETTINGS.networkConfig === "test") {
+        arbFor = arbForWETH
+
+        arbAgainstTokens.push(arbAgainstSHIB)
+        arbAgainstTokens.push(arbAgainstLINK)
+        arbAgainstTokens.push(arbAgainstMATIC)
+        arbAgainstTokens.push(arbAgainstLEO)
+        arbAgainstTokens.push(arbAgainstCRO)
+        arbAgainstTokens.push(arbAgainstAPE)
+        arbAgainstTokens.push(arbAgainstSAND)
+        arbAgainstTokens.push(arbAgainstMANA)
+        arbAgainstTokens.push(arbAgainstAXS)
+        arbAgainstTokens.push(arbAgainstAAVE)
+
+    } else if  (config.PROJECT_SETTINGS.networkConfig === "kovan") {
+        arbFor = arbForWETHKovan
+
+        arbAgainstTokens.push(arbAgainstSHIBKovan)
+        arbAgainstTokens.push(arbAgainstLINKKovan)
+    }
 
     //Create array of arbAgainst names
     // const arbAgainstTokenNames = []

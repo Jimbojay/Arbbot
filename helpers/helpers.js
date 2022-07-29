@@ -3,7 +3,7 @@ const config = require("../config.json")
 
 const Big = require('big.js');
 const Web3 = require('web3');
-let web3
+let web3, chain
 
 // if (!config.PROJECT_SETTINGS.isLocal) {
 //     web3 = new Web3(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
@@ -14,12 +14,14 @@ let web3
 
 if (config.PROJECT_SETTINGS.networkConfig === "main") {
     web3 = new Web3(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
+    chain = "MAINNET"
 } else if (config.PROJECT_SETTINGS.networkConfig === "test") {
     web3 = new Web3('ws://127.0.0.1:7545')
+    chain = "MAINNET"
 } else if  (config.PROJECT_SETTINGS.networkConfig === "kovan") {
     web3 = new Web3('wss://kovan.infura.io/ws/v3/a8aa19688193447d9a185f415344cf61')
+    chain = "KOVAN"
 }
-
 
 const { ChainId, Token } = require("@uniswap/sdk")
 const IUniswapV2Pair = require("@uniswap/v2-core/build/IUniswapV2Pair.json")
@@ -30,7 +32,7 @@ async function getTokenAndContract(_token0Address, _token1Address) {
     const token1Contract = new web3.eth.Contract(IERC20.abi, _token1Address)
 
     const token0 = new Token(
-        ChainId.MAINNET,
+        ChainId.chain,
         _token0Address,
         18,
         await token0Contract.methods.symbol().call(),
@@ -38,7 +40,7 @@ async function getTokenAndContract(_token0Address, _token1Address) {
     )
 
     const token1 = new Token(
-        ChainId.MAINNET,
+        ChainId.chain,
         _token1Address,
         18,
         await token1Contract.methods.symbol().call(),
@@ -54,8 +56,21 @@ async function getPairAddress(_V2Factory, _token0, _token1) {
 }
 
 async function getPairContract(_V2Factory, _token0, _token1) {
+    // console.log('TTTTTTTTTTTTTTTTTT')
+    // console.log(_V2Factory)
+    // console.log('TTTTTTTTTTTTTTTTTT')
+    // console.log(_token0)
+    // console.log('TTTTTTTTTTTTTTTTTT')
+    // console.log(_token1)
+    // console.log('???????????????????')
     const pairAddress = await getPairAddress(_V2Factory, _token0, _token1)
+    // console.log('LLLLLLLLLLLLL')
+    // console.log(pairAddress)
+    // console.log('LLLLLLLLLLLLL')
     const pairContract = new web3.eth.Contract(IUniswapV2Pair.abi, pairAddress)
+    // console.log('KKKKKKKKKK')
+    // console.log(pairContract)
+    // console.log('KKKKKKKKKK')
     return pairContract
 }
 
@@ -83,11 +98,11 @@ async function getEstimatedReturn(amount, _routerPath, _token0, _token1) {
     return { amountIn, amountOut }
 }
 
-async function getTokenAndContractSingle(_tokenAddress) {
+async function getTokenAndContractSingle(_tokenAddress, chainId) {
     const tokenContract = new web3.eth.Contract(IERC20.abi, _tokenAddress)
 
     const token = new Token(
-        ChainId.MAINNET,
+        ChainId.chain,
         _tokenAddress,
         18,
         await tokenContract.methods.symbol().call(),
