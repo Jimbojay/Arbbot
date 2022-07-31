@@ -12,6 +12,17 @@ module.exports = {
       port: 7545,
       network_id: "*" // Match any network id
     },
+    mainnet: {
+      provider: function() {
+        return new HDWalletProvider(
+          privateKey, //array of private keys
+          `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`
+        )
+      },
+      gas: 5000000,
+      gasPrice: 25000000000,
+      network_id: 1,
+    },
     kovan: {
       provider: function() {
         return new HDWalletProvider(

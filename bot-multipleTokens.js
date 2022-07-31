@@ -9,14 +9,18 @@ const { performance } = require('perf_hooks');
 //////////////////////
 const TelegramBot = require('node-telegram-bot-api');
 
-const BOT_TOKEN='5374386214:AAG0ow4m8EvmkDhtbE1TQfMp08wpasWOWtI'
-const CHATID=1018695738
+const botToken = process.env.BOT_TOKEN // This is the address of token we are attempting to arbitrage (WETH)
+const chatID = process.env.CHATID // This is the address of token we are attempting to arbitrage (WETH)
+
+
+// const BOT_TOKEN='5374386214:AAG0ow4m8EvmkDhtbE1TQfMp08wpasWOWtI'
+// const CHATID=1018695738
 
 // replace the value below with the Telegram token you receive from @BotFather
-const token = BOT_TOKEN;
-// read the doc from https://github.com/yagop/node-telegram-bot-api to know how to catch the chatId
-const chatId = CHATID;
-const bot = new TelegramBot(token, { polling: false })
+// const token = BOT_TOKEN;
+// // read the doc from https://github.com/yagop/node-telegram-bot-api to know how to catch the chatId
+// const chatId = CHATID;
+const bot = new TelegramBot(botToken, { polling: false })
 ////////////////////
 
 
@@ -37,6 +41,7 @@ const arbAgainstSAND = process.env.SAND_ADDRESS // LINK
 const arbAgainstMANA = process.env.MANA_ADDRESS // LINK
 const arbAgainstAXS = process.env.AXS_ADDRESS // LINK
 const arbAgainstAAVE = process.env.AAVE_ADDRESS // LINK
+const arbAgainstUSDC = process.env.USDC_ADDRESS
 
 const arbForWETHKovan = process.env.WETH_ADDRESS_KOVAN // This is the address of token we are attempting to arbitrage (WETH)
 const arbAgainstSHIBKovan = process.env.SHIB_ADDRESS_KOVAN // SHIB
@@ -79,6 +84,7 @@ const main = async () => {
         arbAgainstTokens.push(arbAgainstMANA)
         arbAgainstTokens.push(arbAgainstAXS)
         arbAgainstTokens.push(arbAgainstAAVE)
+        arbAgainstTokens.push(arbAgainstUSDC)
 
     } else if  (config.PROJECT_SETTINGS.networkConfig === "kovan") {
         arbFor = arbForWETHKovan
@@ -119,6 +125,16 @@ const main = async () => {
         uPairConcract = await getPairContract(uFactory, token0.address, token1.address)
         sPairConcract = await getPairContract(sFactory, token0.address, token1.address)
 
+        // console.log(uFactory._address)
+        // console.log(sFactory._address)
+        // console.log(token0.address)
+        // console.log(token1.address)
+        // console.log('********************8')
+        // console.log(uPairConcract._address)
+        // console.log('********************8')
+        // console.log(sPairConcract._address)
+        // console.log('********************8')
+
         // _token0Contracts.push(token0Contract)
         _token1Contracts.push(token1Contract)
         // _token0s.push(token0)
@@ -127,6 +143,7 @@ const main = async () => {
         _uPairConcracts.push(uPairConcract)
         _sPairConcracts.push(sPairConcract)
 
+
         _arbAgainstTokens.push(arbAgainstTokens[i])
         // _arbAgainstTokenNames.push(arbAgainstTokenNames[i])
         
@@ -134,7 +151,7 @@ const main = async () => {
         console.log(token1.symbol)
     }
 
-    bot.sendMessage(chatId, 'Script started...')
+    bot.sendMessage(chatID, 'Script started...')
 
     for (let i=0; i < _uPairConcracts.length; i++) {
 
@@ -178,7 +195,7 @@ const main = async () => {
                     console.log(`No Arbitrage Currently Available\n`)
                     console.log(`-----------------------------------------\n`)
                     outputTelegram = 'No Arbitrage Currently Available'
-                    bot.sendMessage(chatId, outputTelegram)
+                    bot.sendMessage(chatID, outputTelegram)
                     
                     isExecuting = false
                     return
@@ -190,7 +207,7 @@ const main = async () => {
                     console.log(`No Arbitrage Currently Available\n`)
                     console.log(`-----------------------------------------\n`)
                     outputTelegram = 'No Arbitrage Currently Available'
-                    bot.sendMessage(chatId, outputTelegram)
+                    bot.sendMessage(chatID, outputTelegram)
 
                     isExecuting = false
                     return
@@ -284,7 +301,7 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
     }
 
     console.log(`Reserves on ${exchangeToSell}`)
-    console.log(`${_token1.symbol}: ${Number(web3.utils.fromWei(reserves[0].toString(), 'ether')).toFixed(0)}`)
+    console.log(`${_token1.symbol}: ${web3.utils.fromWei(reserves[0].toString(), 'ether')}`)
     console.log(`${_token0.symbol}: ${web3.utils.fromWei(reserves[1].toString(), 'ether')}\n`)
 
     try {
@@ -370,6 +387,7 @@ const executeTrade = async (_routerPath, _token0Contract, _token1Contract) => {
     const ethBalanceBefore = await web3.eth.getBalance(account)
 
 
+    // console.log('!?!?!?!!?!?!?!?')
 
     if (config.PROJECT_SETTINGS.isDeployed) {
         await arbitrage.methods.executeTrade(startOnUniswap, _token0Contract._address, _token1Contract._address, amount).send({ from: account, gas: gas})
@@ -378,9 +396,9 @@ const executeTrade = async (_routerPath, _token0Contract, _token1Contract) => {
 
     // const block33 = await web3.eth.getBlock("pending");
     // const estimatedGasCost3 = block33.baseFeePerGas;
-    // console.log('!?!?!?!!?!?!?!?')
+
     // console.log(estimatedGasCost3)
-    // console.log('!?!?!?!!?!?!?!?')
+    // console.log('@@@@@@@@@@@@@@@@')
 
     console.log(`Trade Complete:\n`)
 
@@ -416,7 +434,7 @@ const executeTrade = async (_routerPath, _token0Contract, _token1Contract) => {
 
     outputTelegram = 'Total Gained/Lost ' + `${web3.utils.fromWei((balanceDifference - totalSpent).toString(), 'ether')} ETH`
 
-    bot.sendMessage(chatId, outputTelegram)
+    bot.sendMessage(chatID, outputTelegram)
 
 }
 

@@ -19,7 +19,7 @@ if (config.PROJECT_SETTINGS.networkConfig === "main") {
     web3 = new Web3('ws://127.0.0.1:7545')
     chain = "MAINNET"
 } else if  (config.PROJECT_SETTINGS.networkConfig === "kovan") {
-    web3 = new Web3('wss://kovan.infura.io/ws/v3/a8aa19688193447d9a185f415344cf61')
+    web3 = new Web3(`wss://kovan.infura.io/ws/v3/${process.env.INFURA_API_KEY}`)
     chain = "KOVAN"
 }
 
@@ -30,6 +30,7 @@ const IERC20 = require('@openzeppelin/contracts/build/contracts/ERC20.json')
 async function getTokenAndContract(_token0Address, _token1Address) {
     const token0Contract = new web3.eth.Contract(IERC20.abi, _token0Address)
     const token1Contract = new web3.eth.Contract(IERC20.abi, _token1Address)
+
 
     const token0 = new Token(
         ChainId.chain,
@@ -52,15 +53,20 @@ async function getTokenAndContract(_token0Address, _token1Address) {
 
 async function getPairAddress(_V2Factory, _token0, _token1) {
     const pairAddress = await _V2Factory.methods.getPair(_token0, _token1).call()
+    // console.log('TTTTTTTTTTTTTTTTTT')
+    // console.log(_V2Factory._address)
+    // console.log(_token0)
+    // console.log(_token1)
+    // console.log('****************')
+    // console.log(pairAddress)
+    // console.log('****************')
     return pairAddress
 }
 
 async function getPairContract(_V2Factory, _token0, _token1) {
     // console.log('TTTTTTTTTTTTTTTTTT')
-    // console.log(_V2Factory)
-    // console.log('TTTTTTTTTTTTTTTTTT')
+    // console.log(_V2Factory._address)
     // console.log(_token0)
-    // console.log('TTTTTTTTTTTTTTTTTT')
     // console.log(_token1)
     // console.log('???????????????????')
     const pairAddress = await getPairAddress(_V2Factory, _token0, _token1)
@@ -76,6 +82,13 @@ async function getPairContract(_V2Factory, _token0, _token1) {
 
 async function getReserves(_pairContract) {
     const reserves = await _pairContract.methods.getReserves().call()
+    // console.log('!?!?!?!?!?!?!?!')
+    // console.log(reserves)
+    // console.log('!?!?!?!?!?!?!?!')
+    // console.log(reserves.reserve0)
+    // console.log('!?!?!?!?!?!?!?!')
+    // console.log(reserves.reserve1)
+    // console.log('!?!?!?!?!?!?!?!')
     return [reserves.reserve0, reserves.reserve1]
 }
 
