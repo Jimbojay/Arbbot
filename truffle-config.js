@@ -31,7 +31,7 @@ module.exports = {
         )
       },
       gas: 5000000,
-      gasPrice: 25000000000,
+      maxFeePerGas: 25000000000,
       network_id: 42 
     }
   },

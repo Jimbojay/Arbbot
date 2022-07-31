@@ -65,10 +65,12 @@ async function getPairAddress(_V2Factory, _token0, _token1) {
 
 async function getPairContract(_V2Factory, _token0, _token1) {
     // console.log('TTTTTTTTTTTTTTTTTT')
+    // console.log('88888888888888888888')
     // console.log(_V2Factory._address)
     // console.log(_token0)
     // console.log(_token1)
-    // console.log('???????????????????')
+    // // console.log('???????????????????')
+    // console.log('88888888888888888888')
     const pairAddress = await getPairAddress(_V2Factory, _token0, _token1)
     // console.log('LLLLLLLLLLLLL')
     // console.log(pairAddress)

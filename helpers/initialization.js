@@ -4,10 +4,21 @@ const config = require('../config.json')
 const Web3 = require('web3')
 let web3
 
-if (!config.PROJECT_SETTINGS.isLocal) {
+// if (!config.PROJECT_SETTINGS.isLocal) {
+//     web3 = new Web3(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
+// } else {
+//     web3 = new Web3('ws://127.0.0.1:7545')
+// }
+
+if (config.PROJECT_SETTINGS.networkConfig === "main") {
     web3 = new Web3(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
-} else {
+    chain = "MAINNET"
+} else if (config.PROJECT_SETTINGS.networkConfig === "test") {
     web3 = new Web3('ws://127.0.0.1:7545')
+    chain = "MAINNET"
+} else if  (config.PROJECT_SETTINGS.networkConfig === "kovan") {
+    web3 = new Web3(`wss://kovan.infura.io/ws/v3/${process.env.INFURA_API_KEY}`)
+    chain = "KOVAN"
 }
 
 const IUniswapV2Router02 = require('@uniswap/v2-periphery/build/IUniswapV2Router02.json')
