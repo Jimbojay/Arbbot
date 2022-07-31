@@ -194,7 +194,7 @@ const main = async () => {
                 if (!routerPath) {
                     console.log(`No Arbitrage Currently Available\n`)
                     console.log(`-----------------------------------------\n`)
-                    outputTelegram = 'No Arbitrage Currently Available'
+                    outputTelegram = 'No Arbitrage Currently Available - Pricedifference'
                     bot.sendMessage(chatID, outputTelegram)
                     
                     isExecuting = false
@@ -206,7 +206,7 @@ const main = async () => {
                 if (!isProfitable) {
                     console.log(`No Arbitrage Currently Available\n`)
                     console.log(`-----------------------------------------\n`)
-                    outputTelegram = 'No Arbitrage Currently Available'
+                    outputTelegram = 'No Arbitrage Currently Available - Profitability'
                     bot.sendMessage(chatID, outputTelegram)
 
                     isExecuting = false
