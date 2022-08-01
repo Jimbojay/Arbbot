@@ -1,7 +1,7 @@
 {
     "PROJECT_SETTINGS": {
         "isLocal": true,
-        "isDeployed": false,
+        "isDeployed": true,
         "networkConfig": "main"
     },
     "UNISWAP": {
