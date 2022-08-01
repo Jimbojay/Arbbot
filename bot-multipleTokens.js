@@ -3,6 +3,13 @@
 require('./helpers/server')
 require("dotenv").config();
 
+const { WETH_ADDRESS, SHIB_ADDRESS, LINK_ADDRESS, MATIC_ADDRESS, LEO_ADDRESS, CRO_ADDRESS, APE_ADDRESS, SAND_ADDRESS, MANA_ADDRESS, AXS_ADDRESS, AAVE_ADDRESS, USDC_ADDRESS, WETH_ADDRESS_KOVAN, SHIB_ADDRESS_KOVAN, LINK_ADDRESS_KOVAN, MAXPRIORITYFEE, UNITS, PRICE_DIFFERENCE, GAS_PRICE, GAS_LIMIT } = require('./helpers/variables');
+
+
+const config = require('./config.json')
+const { getTokenAndContract, getPairContract, calculatePrice, getEstimatedReturn, getReserves, getTokenAndContractSingle, getCurrentGasPrice, getBaseFee } = require('./helpers/helpers')
+const { uFactory, uRouter, sFactory, sRouter, web3, arbitrage } = require('./helpers/initialization')
+
 ///////////////
 const { performance } = require('perf_hooks');
 
@@ -24,40 +31,50 @@ const bot = new TelegramBot(botToken, { polling: false })
 ////////////////////
 
 
-const config = require('./config.json')
-const { getTokenAndContract, getPairContract, calculatePrice, getEstimatedReturn, getReserves, getTokenAndContractSingle, getCurrentGasPrice, getBaseFee } = require('./helpers/helpers')
-const { uFactory, uRouter, sFactory, sRouter, web3, arbitrage } = require('./helpers/initialization')
-
 // -- .ENV VALUES HERE -- //
 
-const arbForWETH = process.env.WETH_ADDRESS // This is the address of token we are attempting to arbitrage (WETH)
-const arbAgainstSHIB = process.env.SHIB_ADDRESS // SHIB
-const arbAgainstLINK = process.env.LINK_ADDRESS // LINK
-const arbAgainstMATIC = process.env.MATIC_ADDRESS // LINK
-const arbAgainstLEO = process.env.LEO_ADDRESS // LINK
-const arbAgainstCRO = process.env.CRO_ADDRESS // LINK
-const arbAgainstAPE = process.env.APE_ADDRESS // LINK
-const arbAgainstSAND = process.env.SAND_ADDRESS // LINK
-const arbAgainstMANA = process.env.MANA_ADDRESS // LINK
-const arbAgainstAXS = process.env.AXS_ADDRESS // LINK
-const arbAgainstAAVE = process.env.AAVE_ADDRESS // LINK
-const arbAgainstUSDC = process.env.USDC_ADDRESS
+// const arbForWETH = process.env.WETH_ADDRESS // This is the address of token we are attempting to arbitrage (WETH)
+// const arbAgainstSHIB = process.env.SHIB_ADDRESS // SHIB
+// const arbAgainstLINK = process.env.LINK_ADDRESS // LINK
+// const arbAgainstMATIC = process.env.MATIC_ADDRESS // LINK
+// const arbAgainstLEO = process.env.LEO_ADDRESS // LINK
+// const arbAgainstCRO = process.env.CRO_ADDRESS // LINK
+// const arbAgainstAPE = process.env.APE_ADDRESS // LINK
+// const arbAgainstSAND = process.env.SAND_ADDRESS // LINK
+// const arbAgainstMANA = process.env.MANA_ADDRESS // LINK
+// const arbAgainstAXS = process.env.AXS_ADDRESS // LINK
+// const arbAgainstAAVE = process.env.AAVE_ADDRESS // LINK
+// const arbAgainstUSDC = process.env.USDC_ADDRESS
 
-const arbForWETHKovan = process.env.WETH_ADDRESS_KOVAN // This is the address of token we are attempting to arbitrage (WETH)
-const arbAgainstSHIBKovan = process.env.SHIB_ADDRESS_KOVAN // SHIB
-const arbAgainstLINKKovan = process.env.LINK_ADDRESS_KOVAN // LINK
+// const arbForWETHKovan = process.env.WETH_ADDRESS_KOVAN // This is the address of token we are attempting to arbitrage (WETH)
+// const arbAgainstSHIBKovan = process.env.SHIB_ADDRESS_KOVAN // SHIB
+// const arbAgainstLINKKovan = process.env.LINK_ADDRESS_KOVAN // LINK
+
+const arbForWETH = WETH_ADDRESS // This is the address of token we are attempting to arbitrage (WETH)
+const arbAgainstSHIB = SHIB_ADDRESS // SHIB
+const arbAgainstLINK = LINK_ADDRESS // LINK
+const arbAgainstMATIC = MATIC_ADDRESS // LINK
+const arbAgainstLEO = LEO_ADDRESS // LINK
+const arbAgainstCRO = CRO_ADDRESS // LINK
+const arbAgainstAPE = APE_ADDRESS // LINK
+const arbAgainstSAND = SAND_ADDRESS // LINK
+const arbAgainstMANA = MANA_ADDRESS // LINK
+const arbAgainstAXS = AXS_ADDRESS // LINK
+const arbAgainstAAVE = AAVE_ADDRESS // LINK
+const arbAgainstUSDC = USDC_ADDRESS
+
+const arbForWETHKovan = WETH_ADDRESS_KOVAN // This is the address of token we are attempting to arbitrage (WETH)
+const arbAgainstSHIBKovan = SHIB_ADDRESS_KOVAN // SHIB
+const arbAgainstLINKKovan = LINK_ADDRESS_KOVAN // LINK
 
 const infuraApiKey = process.env.INFURA_API_KEY
-
-const maxPriorityFee= process.env.MAXPRIORITYFEE
-
-
 const account = process.env.ACCOUNT // Account to recieve profit
-const units = process.env.UNITS // Used for price display/reporting
-const difference = process.env.PRICE_DIFFERENCE
-const gas = process.env.GAS_LIMIT
-const estimatedGasCost = process.env.GAS_PRICE // Estimated Gas: 0.008453220000006144 ETH + ~10%
 
+const maxPriorityFee= MAXPRIORITYFEE
+const units = UNITS // Used for price display/reporting
+const difference = PRICE_DIFFERENCE
+const gas = GAS_LIMIT
+const estimatedGasCost = GAS_PRICE // Estimated Gas: 0.008453220000006144 ETH + ~10%
 
 let uPair, sPair, amount
 let isExecuting = false
