@@ -125,7 +125,11 @@ const main = async () => {
     const _uPairConcracts = []
     const _sPairConcracts = []
 
+    console.log('?!?!?!?!?')
+
     const { tokenContract, token } = await getTokenAndContractSingle(arbFor)
+
+    console.log('?!?!?!?!?')
 
     const token0 = token
     const token0Contract = tokenContract
@@ -326,10 +330,14 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
         // This returns the amount of WETH needed
         let result = await _routerPath[0].methods.getAmountsIn(reserves[0], [_token0.address, _token1.address]).call()
 
+        console.log('1111111111111111111111')
         const token0In = result[0] // WETH
         const token1In = result[1] // SHIB
+        console.log('22222222222222')
 
         result = await _routerPath[1].methods.getAmountsOut(token1In, [_token1.address, _token0.address]).call()
+
+        console.log('333333333333')
 
         console.log(`Estimated amount of WETH needed to buy enough ${_token1.symbol} on ${exchangeToBuy}\t\t| ${web3.utils.fromWei(token0In, 'ether')}`)
         console.log(`Estimated amount of WETH returned after swapping ${_token1.symbol} on ${exchangeToSell}\t| ${web3.utils.fromWei(result[1], 'ether')}\n`)
