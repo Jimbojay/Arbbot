@@ -109,6 +109,8 @@ async function getEstimatedReturn(amount, _routerPath, _token0, _token1) {
 
     const amountIn = Number(web3.utils.fromWei(trade1[0], 'ether'))
     const amountOut = Number(web3.utils.fromWei(trade2[1], 'ether'))
+    // const amountIn = trade1[0]
+    // const amountOut = trade2[1]
 
     return { amountIn, amountOut }
 }
@@ -133,6 +135,9 @@ async function getBaseFee(URL = 'ws://127.0.0.1:7545') {
 
     // NOTE: Property 'baseFeePerGas' does not exist on type 'BlockTransactionString'
     const block = await web3.eth.getBlock("pending");
+    console.log('**************')
+    console.log(block.number)
+    console.log('**************')
     const estimatedGasCost = block.baseFeePerGas;
 
     return estimatedGasCost

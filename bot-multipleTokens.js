@@ -2,10 +2,11 @@
 
 require('./helpers/server')
 require("dotenv").config();
+const ethers = require('ethers');
 
 const { WETH_ADDRESS, SHIB_ADDRESS, LINK_ADDRESS, MATIC_ADDRESS, LEO_ADDRESS, CRO_ADDRESS, APE_ADDRESS, SAND_ADDRESS, MANA_ADDRESS, AXS_ADDRESS, AAVE_ADDRESS, USDC_ADDRESS, WETH_ADDRESS_KOVAN, SHIB_ADDRESS_KOVAN, LINK_ADDRESS_KOVAN, MAXPRIORITYFEE, UNITS, PRICE_DIFFERENCE, GAS_PRICE, GAS_LIMIT } = require('./helpers/variables');
 
-
+const Big = require('big.js');
 const config = require('./config.json')
 const { getTokenAndContract, getPairContract, calculatePrice, getEstimatedReturn, getReserves, getTokenAndContractSingle, getCurrentGasPrice, getBaseFee } = require('./helpers/helpers')
 const { uFactory, uRouter, sFactory, sRouter, web3, arbitrage } = require('./helpers/initialization')
@@ -309,17 +310,23 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
     // This is where you can customize your conditions on whether a profitable trade is possible.
     // This is a basic example of trading WETH/SHIB...
 
-    let reserves, exchangeToBuy, exchangeToSell
+    let reserves, exchangeToBuy, exchangeToSell, reservesBuy
 
     if (_routerPath[0]._address == uRouter._address) {
         reserves = await getReserves(_sPair)
+        reservesBuy = await getReserves(_uPair)
         exchangeToBuy = 'Uniswap'
         exchangeToSell = 'Sushiswap'
     } else {
         reserves = await getReserves(_uPair)
+        reservesBuy = await getReserves(_sPair)
         exchangeToBuy = 'Sushiswap'
         exchangeToSell = 'Uniswap'
     }
+
+    console.log(`Reserves on ${exchangeToBuy}`)
+    console.log(`${_token1.symbol}: ${web3.utils.fromWei(reservesBuy[0].toString(), 'ether')}`)
+    console.log(`${_token0.symbol}: ${web3.utils.fromWei(reservesBuy[1].toString(), 'ether')}\n`)
 
     console.log(`Reserves on ${exchangeToSell}`)
     console.log(`${_token1.symbol}: ${web3.utils.fromWei(reserves[0].toString(), 'ether')}`)
@@ -327,8 +334,21 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
 
     try {
 
+        let minReserves
         // This returns the amount of WETH needed
-        let result = await _routerPath[0].methods.getAmountsIn(reserves[0], [_token0.address, _token1.address]).call()
+
+        // const minReserves = ethers.utils.parseUnits(Math.min(reservesBuy[0], reserves[0]).toString(),18).toString()
+        // console.log(minReserves)
+
+        if (reserves[0] < reservesBuy[0]) {
+        minReserves = reserves[0];
+        } else {
+        minReserves = reservesBuy[0];
+        }
+
+        // ethers.utils.parseUnits("1.0", 8).toString()
+
+        let result = await _routerPath[0].methods.getAmountsIn(minReserves, [_token0.address, _token1.address]).call()
 
         console.log('1111111111111111111111')
         const token0In = result[0] // WETH
@@ -348,12 +368,16 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
         let ethBalanceBefore = await web3.eth.getBalance(account)
         ethBalanceBefore = web3.utils.fromWei(ethBalanceBefore, 'ether')
 
+
         const gasPriceEstimation = await getBaseFee()
+        const maxGasFee = ((2 * Number(gasPriceEstimation)) + Number(maxPriorityFee)) //gasprice fluctuates heavily and therefor markup of 100%
+        const totalGasFees = web3.utils.fromWei(( maxGasFee * gas).toString(), 'ether') // get total gas fee by multiplying the price per gas with the amount of gas
 
-        const maxFee = web3.utils.fromWei(((2 * Number(gasPriceEstimation)) + Number(maxPriorityFee)).toString(), 'ether') //gasprice fluctuates heavily and therefor markup of 100%
+        console.log(gasPriceEstimation)
+        console.log(maxPriorityFee)
+        console.log(maxGasFee)
 
-
-        const ethBalanceAfter = ethBalanceBefore - maxFee
+        const ethBalanceAfter = ethBalanceBefore - totalGasFees
 
         const amountDifference = amountOut - amountIn
         let wethBalanceBefore = await _token0Contract.methods.balanceOf(account).call()
@@ -362,13 +386,13 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
         const wethBalanceAfter = amountDifference + Number(wethBalanceBefore)
         const wethBalanceDifference = wethBalanceAfter - Number(wethBalanceBefore)
 
-        const totalGained = wethBalanceDifference - Number(maxFee)
+        const totalGained = wethBalanceDifference - Number(totalGasFees)
 
 
         const data = {
             'ETH Balance Before': ethBalanceBefore,
             'ETH Balance After': ethBalanceAfter,
-            'ETH Spent (gas no fees)': maxFee,
+            'ETH Spent (gas no fees)': totalGasFees,
             '-': {},
             'WETH Balance BEFORE': wethBalanceBefore,
             'WETH Balance AFTER': wethBalanceAfter,
@@ -380,7 +404,7 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
         console.table(data)
         console.log()
 
-        if (amountOut < (amountIn - maxFee)) {
+        if (amountOut < (amountIn - totalGained)) {
             return false
         }
 
@@ -412,7 +436,10 @@ const executeTrade = async (_routerPath, _token0Contract, _token1Contract) => {
     const ethBalanceBefore = await web3.eth.getBalance(account)
 
 
-    // console.log('!?!?!?!!?!?!?!?')
+
+    console.log('!?!?!?!!?!?!?!?')
+    console.log(amount)
+    console.log('!?!?!?!!?!?!?!?')
 
     if (config.PROJECT_SETTINGS.isDeployed) {
         await arbitrage.methods.executeTrade(startOnUniswap, _token0Contract._address, _token1Contract._address, amount).send({ from: account, gas: gas})

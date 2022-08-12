@@ -4,7 +4,7 @@ require('./helpers/server')
 require("dotenv").config();
 const config = require("./config.json")
 
-const { getTokenAndContract, getPairContract, calculatePrice, getEstimatedReturn, getReserves, getTokenAndContractSingle, getCurrentGasPrice, getBaseFee } = require('./helpers/helpers')
+const { getTokenAndContract, getPairContract, calculatePrice, getEstimatedReturn, getReserves } = require('./helpers/helpers')
 const { uFactory, uRouter, sFactory, sRouter, web3, arbitrage } = require('./helpers/initialization')
 
 const Big = require('big.js');
@@ -88,91 +88,6 @@ const main = async () => {
     console.log(`Sushiswap amountin  - ${result}`)
     console.log(`Price - ${Big(minReserves).div(Big(result)).toString()}`)
 
-    
-
-    console.log('----------')
-
-    console.log('amountsout')
-    result = await uRouter.methods.getAmountsOut(token1In, [arbAgainst, WETH_ADDRESS]).call()
-    console.log(`Uniswap amountSout   - ${result}`)
-
-    result = await sRouter.methods.getAmountsOut(token1In, [arbAgainst, WETH_ADDRESS]).call()
-    console.log(`Sushiswap amountSout - ${result}`)
-
-    result = await uRouter.methods.getAmountOut(token1In, arbAgainst, WETH_ADDRESS).call()
-    console.log(`Uniswap amountout    - ${result}`)
-
-    result = await sRouter.methods.getAmountOut(token1In, arbAgainst, WETH_ADDRESS).call()
-    console.log(`Sushiswap amountout  - ${result}`)
-  
-
-    // console.log(`Estimated amount of WETH needed to buy enough other token on ${exchangeToBuy}\t\t| ${web3.utils.fromWei(token0In, 'ether')}`)
-    // console.log(`Estimated amount of WETH returned after swapping other token on ${exchangeToSell}\t| ${web3.utils.fromWei(result[1], 'ether')}\n`)
-
 }
 
-    /////////////////////////
-    //Custom test requirements
-    //////////////////////////
-
-    // require('./scripts/manipulatePrice_SELLSHIB_UNI.js');
-
-
-    // /////////////////////////
-    // //Estimate function
-    // //////////////////////////
-    // let estimateGas = await web3.eth.estimateGas({
-    // "data": contract.methods.executeTrade(true, token0Contract._address, token1Contract._address, 1).encodeABI(),
-    // "from": account,
-    // "to": contract._address
-    // });
-
-    // console.log(estimateGas)
-
-/////////////////////////////////////////
-//Test transactions
-///////////////////////////////////////
-
-
- //    const block = await web3.eth.getBlock("pending");
- //    console.log(block.number)
- //    const estimatedGasCost = block.baseFeePerGas;
-
- //    console.log(estimatedGasCost)
-
- //    console.log('000000000000000')
-
- //    let receipt
- //    let txr 
-
-    // receipt = await web3.eth.getTransactionReceipt("0xf88655059df11e9d072ecfe9238d2f851bf30cf756db08c67cd6b6f252f20cf7")
-    // txr = parseInt(receipt.effectiveGasPrice)
-    // console.log(txr);
-
- //    console.log('------------------')
-
- //    receipt = await web3.eth.getTransactionReceipt("0x4431f783a58ce577928ca404930cee75d3aaddcd7ba66c1a27fa86dfd85dfcba")
- //    txr = parseInt(receipt.effectiveGasPrice)
- //    console.log(txr);
-
- //    console.log('------------------')
-
- //    receipt = await web3.eth.getTransactionReceipt("0xc1dff89a41bc0e731862015980785bb04daa658631aa1a4e69dd9ca73a146758")
- //    txr = parseInt(receipt.effectiveGasPrice)
- //    console.log(txr);
-
-    // // console.log('---------------')
-    // // console.log(receipt)
-    // console.log('!!!!!!!!!!!!!!!')
-    // // const balanceAfter = await token0Contract.methods.balanceOf(account).call()
-    // // console.log(balanceAfter)
-
-
-// 0x5c88617bf053600e36141423808dff7db746f358b08745247c9a8324be2d3f5f
-// 0x2d2fe7d089dfd148ef5f2875bbfbcaff8f02996f3bdbe9ab4e4e21cce8b4fbab
-// 0xd5afdb62ac562c14c8104a00eea761a9fc8706a8c0642b6d8340f91ed1df09ed
-
-/////////////////////////////////////////////////////
-
-// getBaseFee(`wss://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
 main()
